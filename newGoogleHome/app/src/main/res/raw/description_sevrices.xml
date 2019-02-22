@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scpd xmlns:android="http://schemas.android.com/apk/res/android">
+    <specVersion>
+        <major>1</major>
+        <minor>0</minor>
+    </specVersion>
+    <actionList>
+        <action>
+            <name>Up</name>
+            <argumentList>
+                <argument>
+                    <name>Result</name>
+                    <relatedStateVariable>Result</relatedStateVariable>
+                    <direction>out</direction>
+                </argument>
+            </argumentList>
+        </action>
+        <action>
+            <name>Down</name>
+            <argumentList>
+                <argument>
+                    <name>Result</name>
+                    <relatedStateVariable>Result</relatedStateVariable>
+                    <direction>out</direction>
+                </argument>
+            </argumentList>
+        </action>
+        <action>
+            <name>GetStatus</name>
+            <argumentList>
+                <argument>
+                    <name>up</name>
+                    <relatedStateVariable>up</relatedStateVariable>
+                    <direction>out</direction>
+                </argument>
+            </argumentList>
+        </action>
+    </actionList>
+    <serviceStateTable>
+        <stateVariable sendEvents="yes">
+            <name>up</name>
+            <dataType>String</dataType>
+        </stateVariable>
+        <stateVariable sendEvents="no">
+            <name>Result</name>
+            <dataType>boolean</dataType>
+        </stateVariable>
+    </serviceStateTable>
+</scpd>

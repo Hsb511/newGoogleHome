@@ -21,14 +21,16 @@ public class BlindDevice extends Device implements ActionListener, QueryListener
 	
 	public BlindDevice(InputStream inputStream) throws InvalidDescriptionException {
 		super(inputStream);
+		/*
 		Action upAction = getAction("Up");
+        //Log.d("DEVICE", "UPACTION"+upAction.toString());
 		upAction.setActionListener(this);
 		
 		Action downAction = getAction("Down");
 		downAction.setActionListener(this);
 		
 		upState = getStateVariable("up");
-        Log.d("DEVICE","Device created");
+        Log.d("DEVICE","Device created");*/
 	}
 		
 	@Override

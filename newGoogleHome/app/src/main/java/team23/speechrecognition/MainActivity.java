@@ -2,6 +2,9 @@ package team23.speechrecognition;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.os.AsyncTask;
+import android.os.Process;
 import android.speech.RecognizerIntent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,6 +13,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -33,19 +37,8 @@ public class MainActivity extends AppCompatActivity {
                 promptSpeechInput();
             }
         });
+        new StartControlPointTask().execute();
 
-        try {
-            InputStream inputStream = this.getResources().openRawResource(R.description.description);
-            BlindDevice blindDev = new BlindDevice(inputStream);
-            Log.d("DEVICE", "CREATED DEVICE...........");
-            blindDev.start();
-            Log.d("DEVICE", "STARTED DEVICE...........");
-
-        }
-        catch (InvalidDescriptionException e){
-            String errMsg = e.getMessage();
-            Log.d("DEVICE","InvalidDescriptionException = " + errMsg);
-        }
     }
 
     private void promptSpeechInput() {
@@ -76,6 +69,41 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
 
+        }
+    }
+
+    private class StartControlPointTask extends AsyncTask {
+        public static final String TAG = "StartControlPointTask";
+        @Override
+        protected Object doInBackground(Object... params) {
+            Process.setThreadPriority(Process.THREAD_PRIORITY_FOREGROUND);
+            try {
+                InputStream inputStream = getResources().openRawResource(R.raw.description_device);
+                BlindDevice blindDev = new BlindDevice(inputStream);
+                Service upnpService = blindDev.getService("urn:schemas-upnp-org:serviceId:power:1");
+            InputStream stream = getResources().openRawResource(R.raw.description_sevrices);
+            String xmlServices = "";
+            try {
+                byte[] buffer = new byte[stream.available()];
+                stream.read(buffer);
+                stream.close();
+                Log.i("xml", new String(buffer));
+                xmlServices = new String(buffer);
+            } catch (IOException e) {
+                // Error handling
+            }
+            boolean scpdSuccess = upnpService.loadSCPD(xmlServices);
+
+                Log.d("DEVICE", "CREATED DEVICE...........");
+                blindDev.start();
+                Log.d("DEVICE", "STARTED DEVICE...........");
+
+            }
+            catch (InvalidDescriptionException e){
+                String errMsg = e.getMessage();
+                Log.d("DEVICE","InvalidDescriptionException = " + errMsg);
+            }
+            return null;
         }
     }
 }
