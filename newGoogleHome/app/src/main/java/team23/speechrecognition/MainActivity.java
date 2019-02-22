@@ -5,12 +5,17 @@ import android.content.Intent;
 import android.speech.RecognizerIntent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Locale;
+
+import org.cybergarage.upnp.*;
+import org.cybergarage.upnp.device.*;
 
 public class MainActivity extends AppCompatActivity {
     private TextView textTV;
@@ -19,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        UPnP.setEnable(UPnP.USE_ONLY_IPV4_ADDR);
 
         textTV = findViewById(R.id.text_said);
         findViewById(R.id.start_button).setOnClickListener(new View.OnClickListener() {
@@ -27,6 +33,19 @@ public class MainActivity extends AppCompatActivity {
                 promptSpeechInput();
             }
         });
+
+        try {
+            InputStream inputStream = this.getResources().openRawResource(R.description.description);
+            BlindDevice blindDev = new BlindDevice(inputStream);
+            Log.d("DEVICE", "CREATED DEVICE...........");
+            blindDev.start();
+            Log.d("DEVICE", "STARTED DEVICE...........");
+
+        }
+        catch (InvalidDescriptionException e){
+            String errMsg = e.getMessage();
+            Log.d("DEVICE","InvalidDescriptionException = " + errMsg);
+        }
     }
 
     private void promptSpeechInput() {

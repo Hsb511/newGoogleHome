@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="clink170">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/F2B/506/clink170.jar!/" />
+      <root url="jar://$USER_HOME$/F2B/506/jars/resolver.jar!/" />
+      <root url="jar://$USER_HOME$/F2B/506/jars/serializer.jar!/" />
+      <root url="jar://$USER_HOME$/F2B/506/jars/xercesImpl.jar!/" />
+      <root url="jar://$USER_HOME$/F2B/506/jars/xercesSamples.jar!/" />
+      <root url="jar://$USER_HOME$/F2B/506/jars/xml-apis.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/F2B/506/clink170.jar!/" />
+    </SOURCES>
+  </library>
+</component>
