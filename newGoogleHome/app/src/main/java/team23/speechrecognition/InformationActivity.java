@@ -12,9 +12,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 public class InformationActivity extends AppCompatActivity {
-    private static final String MY_PREFERENCES = "preferencesors";
-    private static final String MY_BUILDING = "buildingdong";
-    private static final String MY_FLOOR = "dance_floor";
+    public static final String MY_PREFERENCES = "preferencesors";
+    public static final String MY_BUILDING = "buildingdong";
+    public static final String MY_FLOOR = "dance_floor";
     protected String buildingValue = "";
     protected String floorValue = "";
 
@@ -63,7 +63,7 @@ public class InformationActivity extends AppCompatActivity {
         findViewById(R.id.confirm_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(InformationActivity.this, MainActivity.class);
+                Intent intent = new Intent(InformationActivity.this, ShowerActivity.class);
                 SharedPreferences preferences = getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString(MY_BUILDING, buildingValue);
