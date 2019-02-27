@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="building_names">
+        <item>i1</item>
+        <item>i2</item>
+        <item>i3</item>
+        <item>i4</item>
+        <item>i5</item>
+        <item>i6</item>
+        <item>i7</item>
+        <item>i8</item>
+    </string-array>
+</resources>
