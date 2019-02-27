@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 public class ShowerActivity extends AppCompatActivity {
     protected TextView infoTV;
+    protected TextView showerTV;
     protected String myBuilding;
     protected String myFloor;
 
@@ -24,5 +25,10 @@ public class ShowerActivity extends AppCompatActivity {
                 + getResources().getString(R.string.floor) + " : "
                 + myFloor;
         infoTV.setText(displayInfo);
+
+        showerTV = findViewById(R.id.available_shower);
+
+        //TODO RECUPERE L'INFOS DU NOMBRE DE DOUCHES A MON BATIMENT ET A MON ETAGE
+        showerTV.setText("3");
     }
 }

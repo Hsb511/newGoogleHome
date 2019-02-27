@@ -3,4 +3,5 @@
 
     <string name="building">Building</string>
     <string name="floor">Floor</string>
+    <string name="available_showers">Amount of available showers : </string>
 </resources>
