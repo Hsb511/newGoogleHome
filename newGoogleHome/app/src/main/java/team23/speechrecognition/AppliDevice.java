@@ -17,6 +17,10 @@ public class AppliDevice extends Device implements ActionListener, QueryListener
 
     private StateVariable stateVar;
     private StateVariable nbAvailableShowerState;
+    private String nbAvailableShowers;
+    private String nameBuilding = "";
+    private String nameFloor = "";
+
 
     public AppliDevice(InputStream inputStream) throws InvalidDescriptionException {
         super(inputStream);
@@ -29,6 +33,9 @@ public class AppliDevice extends Device implements ActionListener, QueryListener
         Action setAvailableShowersAction = getAction("SetAvailableShowers");
         setAvailableShowersAction.setActionListener(this);
 
+        Action getBuildingFloorAction = getAction("GetBuildingFloor");
+        getBuildingFloorAction.setActionListener(this);
+
         ServiceList serviceList = getServiceList();
         Service service = serviceList.getService(0);
         service.setQueryListener(this);
@@ -37,10 +44,14 @@ public class AppliDevice extends Device implements ActionListener, QueryListener
         this.start();
     }
 
-    private String nbAvailableShowers;
+    public void setNameBuilding(String nameBuilding) {
+        this.nameBuilding = nameBuilding;
+    }
 
-    private String nameBuilding = "i1";
-    private String nameFloor = "1";
+    public void setNameFloor(String nameFloor) {
+        this.nameFloor = nameFloor;
+    }
+
 
     ////////////////////////////////////////////////
     //	Asking number of shower available
@@ -74,30 +85,31 @@ public class AppliDevice extends Device implements ActionListener, QueryListener
 
     public boolean actionControlReceived(Action action) {
         String actionName = action.getName();
-        System.out.println("ActionName : " + actionName);
+        Log.d("DEVICE","ActionName : " + actionName);
 
         boolean ret = false;
 
-        if (actionName.equals("GetAskingState") == true) {
+        if (actionName.equals("GetAskingState")) {
             String state = getAskingState();
             Argument stateArg = action.getArgument("AskingState");
             stateArg.setValue(state);
             ret = true;
         }
 
-        if (actionName.equals("SetAvailableShowers") == true) {
+        if (actionName.equals("SetAvailableShowers")) {
             Argument nbOfShower = action.getArgument("NbAvailableShowers");
             nbAvailableShowers = nbOfShower.getValue();
-            //stopAsking();
+            stopAsking();
             System.out.println("Nombre de douches : " + nbAvailableShowers);
             ret = true;
         }
 
-        if (actionName.equals("GetBuildingFloor") == true) {
+        if (actionName.equals("GetBuildingFloor")) {
             Argument buildingArg = action.getArgument("nameBuilding");
-            buildingArg.setValue(nameBuilding);
+            buildingArg.setValue(this.nameBuilding);
             Argument floorArg = action.getArgument("nameFloor");
-            floorArg.setValue(nameFloor);
+            floorArg.setValue(this.nameFloor);
+            Log.d("DEVICE","giving building and floor");
             ret = true;
         }
 
