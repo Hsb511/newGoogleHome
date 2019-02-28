@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">SpeechRecognition</string>
+
     <string name="title_activity_information">InformationActivity</string>
+
+    <string name="building">Building</string>
+    <string name="floor">Floor</string>
+    <string name="available_showers">Amount of available showers : </string>
+
 </resources>

@@ -2,7 +2,6 @@ package team23.speechrecognition;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Process;
 import android.speech.RecognizerIntent;
@@ -24,6 +23,7 @@ import org.cybergarage.upnp.device.*;
 public class MainActivity extends AppCompatActivity {
     private TextView textTV;
     private final int REQ_CODE_SPEECH_INPUT = 23;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
                 promptSpeechInput();
             }
         });
+        Log.d("DEVICE","should start device");
         new StartControlPointTask().execute();
 
     }
@@ -74,34 +75,33 @@ public class MainActivity extends AppCompatActivity {
 
     private class StartControlPointTask extends AsyncTask {
         public static final String TAG = "StartControlPointTask";
+
         @Override
         protected Object doInBackground(Object... params) {
             Process.setThreadPriority(Process.THREAD_PRIORITY_FOREGROUND);
             try {
                 InputStream inputStream = getResources().openRawResource(R.raw.description_device);
-                BlindDevice blindDev = new BlindDevice(inputStream);
-                Service upnpService = blindDev.getService("urn:schemas-upnp-org:serviceId:power:1");
-            InputStream stream = getResources().openRawResource(R.raw.description_sevrices);
-            String xmlServices = "";
-            try {
-                byte[] buffer = new byte[stream.available()];
-                stream.read(buffer);
-                stream.close();
-                Log.i("xml", new String(buffer));
-                xmlServices = new String(buffer);
-            } catch (IOException e) {
-                // Error handling
-            }
-            boolean scpdSuccess = upnpService.loadSCPD(xmlServices);
-
+                AppliDevice appliDeviceDev = new AppliDevice(inputStream);
+                Service upnpService = appliDeviceDev.getService("urn:schemas-upnp-org:serviceId:state:1");
+                InputStream stream = getResources().openRawResource(R.raw.description_services);
+                String xmlServices = "";
+                try {
+                    byte[] buffer = new byte[stream.available()];
+                    stream.read(buffer);
+                    stream.close();
+                    Log.i("xml", new String(buffer));
+                    xmlServices = new String(buffer);
+                } catch (IOException e) {
+                    // Error handling
+                }
+                boolean scpdSuccess = upnpService.loadSCPD(xmlServices);
                 Log.d("DEVICE", "CREATED DEVICE...........");
-                blindDev.start();
+                appliDeviceDev.start();
                 Log.d("DEVICE", "STARTED DEVICE...........");
 
-            }
-            catch (InvalidDescriptionException e){
+            } catch (InvalidDescriptionException e) {
                 String errMsg = e.getMessage();
-                Log.d("DEVICE","InvalidDescriptionException = " + errMsg);
+                Log.d("DEVICE", "InvalidDescriptionException = " + errMsg);
             }
             return null;
         }

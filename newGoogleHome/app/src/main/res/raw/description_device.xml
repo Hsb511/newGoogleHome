@@ -30,7 +30,7 @@
 			<service>
 				<serviceType>urn:schemas-upnp-org:service:state:1</serviceType> 
 				<serviceId>urn:schemas-upnp-org:serviceId:state:1</serviceId> 
-				<SCPDURL>/service/state/description.xml</SCPDURL> 
+				<SCPDURL>/description_services.xml</SCPDURL>
 				<controlURL>/service/state/control</controlURL> 
 				<eventSubURL>/service/state/eventSub</eventSubURL> 
 			</service>
