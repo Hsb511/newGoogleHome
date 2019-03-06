@@ -17,7 +17,9 @@ public class AppliDevice extends Device implements ActionListener, QueryListener
 
     private StateVariable stateVar;
     private StateVariable nbAvailableShowerState;
-    private String nbAvailableShowers;
+    private StateVariable nbTotalShowersState;
+    private String nbAvailableShowers = "";
+    private String nbTotalShowers = "";
     private String nameBuilding = "";
     private String nameFloor = "";
 
@@ -99,8 +101,12 @@ public class AppliDevice extends Device implements ActionListener, QueryListener
         if (actionName.equals("SetAvailableShowers")) {
             Argument nbOfShower = action.getArgument("NbAvailableShowers");
             nbAvailableShowers = nbOfShower.getValue();
+            Argument nbTotalShowersArg = action.getArgument("NbTotalShowers");
+            nbTotalShowers = nbTotalShowersArg.getValue();
             stopAsking();
+            ShowerActivity.showShowerInfo(nbAvailableShowers);
             System.out.println("Nombre de douches : " + nbAvailableShowers);
+            Log.d("DEVICE", "Nombre de douches : " + nbAvailableShowers);
             ret = true;
         }
 

@@ -1,5 +1,6 @@
 package team23.speechrecognition;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -26,14 +27,20 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class ShowerActivity extends AppCompatActivity {
-    protected TextView infoTV;
-    protected TextView showerTV;
-    protected LinearLayout stateLayout;
+    protected static TextView infoTV;
+    protected static TextView showerTV;
+    protected static LinearLayout stateLayout;
     protected String myBuilding;
     protected String myFloor;
     private AppliDevice cyberlinkDevice;
-    protected int screenWidth;
+    protected static int screenWidth;
     protected int showerImageHeight;
+    protected String nbTotalShowers = "";
+    protected String nbAvailableShowers = "";
+    protected static Drawable drawable;
+    protected static ImageView douche1;
+    protected static ImageView douche2;
+    protected static ImageView douche3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,13 +48,26 @@ public class ShowerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_shower);
         infoTV = findViewById(R.id.info_textView);
         stateLayout = findViewById(R.id.show_showers_state_layout);
+        showerTV = findViewById(R.id.available_shower);
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         screenWidth = displayMetrics.widthPixels;
 
+        SharedPreferences preferences = getSharedPreferences(InformationActivity.MY_PREFERENCES, MODE_PRIVATE);
+        myBuilding = preferences.getString(InformationActivity.MY_BUILDING, "i1");
+        myFloor = preferences.getString(InformationActivity.MY_FLOOR, "1");
+        String displayInfo = getResources().getString(R.string.building) + " : "
+                + myBuilding + " - "
+                + getResources().getString(R.string.floor) + " : "
+                + myFloor;
+        infoTV.setText(displayInfo);
 
-        showShowerInfo();
+        drawable = getResources().getDrawable(R.drawable.free_shower);
+
+        douche1 = new ImageView(getApplicationContext());
+        douche2 = new ImageView(getApplicationContext());
+        douche3 = new ImageView(getApplicationContext());
 
         UPnP.setEnable(UPnP.USE_ONLY_IPV4_ADDR);
         Log.d("DEVICE","should start device");
@@ -100,37 +120,24 @@ public class ShowerActivity extends AppCompatActivity {
         cyberlinkDevice.stop();
     }
 
-    protected void showShowerInfo() {
-        SharedPreferences preferences = getSharedPreferences(InformationActivity.MY_PREFERENCES, MODE_PRIVATE);
-        myBuilding = preferences.getString(InformationActivity.MY_BUILDING, "i1");
-        myFloor = preferences.getString(InformationActivity.MY_FLOOR, "1");
-        String displayInfo = getResources().getString(R.string.building) + " : "
-                + myBuilding + " - "
-                + getResources().getString(R.string.floor) + " : "
-                + myFloor;
-        infoTV.setText(displayInfo);
+    public static void showShowerInfo(String amount) {
+        int showersAmount = Integer.parseInt(amount);
 
-        showerTV = findViewById(R.id.available_shower);
-
-        //TODO: RECUPERE L'INFOS DU NOMBRE DE DOUCHES A MON BATIMENT ET A MON ETAGE
-        int showers = 3;
+        int showers = showersAmount;
         showerTV.setText(String.valueOf(showers));
 
         for (int i = 0; i < showers; i++) {
-            ImageView iv = new ImageView(getApplicationContext());
+            //TODO RECUPERE NON DYNAMIQUEMENT LES DOUCHE1, 2 ET 3
             int showerWidth = Math.round((screenWidth - 32)/showers);
             int showerHeight = Math.round(showerWidth * 13 / 6);
-            Bitmap image = convertToBitmap(getResources().getDrawable(R.drawable.free_shower), showerWidth, showerHeight);
-            if (i == showers - 1) {
-                image = convertToBitmap(getResources().getDrawable(R.drawable.using_shower), showerWidth, showerHeight);
-            }
-            iv.setImageBitmap(image);
+
+            iv.setImageBitmap(convertToBitmap(drawable, showerWidth, showerHeight));
             stateLayout.addView(iv);
-            Log.i("shower_debug", "showers ImageView : " + stateLayout.getChildCount());
+            Log.i("DEVICE", "showers ImageView : " + stateLayout.getChildCount());
         }
     }
 
-    public Bitmap convertToBitmap(Drawable drawable, int widthPixels, int heightPixels) {
+    public static Bitmap convertToBitmap(Drawable drawable, int widthPixels, int heightPixels) {
         Bitmap mutableBitmap = Bitmap.createBitmap(widthPixels, heightPixels, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(mutableBitmap);
         drawable.setBounds(0, 0, widthPixels, heightPixels);
