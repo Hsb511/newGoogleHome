@@ -1,25 +1,20 @@
 package team23.speechrecognition;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 
 import android.os.AsyncTask;
 import android.os.Process;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.apache.xerces.impl.xpath.regex.Match;
 import org.cybergarage.upnp.Service;
 import org.cybergarage.upnp.UPnP;
 import org.cybergarage.upnp.device.InvalidDescriptionException;
@@ -92,9 +87,9 @@ public class ShowerActivity extends AppCompatActivity {
 
     private class StartDeviceTask extends AsyncTask<Void, Void, String> {
         public static final String TAG = "StartControlPointTask";
-
+        private String showersState = "/";
         @Override
-        protected Void doInBackground(Void... params) {
+        protected String doInBackground(Void... params) {
             Process.setThreadPriority(Process.THREAD_PRIORITY_FOREGROUND);
             try {
                 InputStream inputStream = getResources().openRawResource(R.raw.description_device);
@@ -119,14 +114,16 @@ public class ShowerActivity extends AppCompatActivity {
                 Log.d("DEVICE", "CREATED DEVICE...........");
                 cyberlinkDevice.startDevice();
                 cyberlinkDevice.startAsking();
-
+                while (showersState.equals("/")) {
+                    showersState = cyberlinkDevice.getNbAvailableShowers()+
+                            "/"+cyberlinkDevice.getNbTotalShowers();
+                }
                 Log.d("DEVICE", "STARTED DEVICE...........");
-
             } catch (InvalidDescriptionException e) {
                 String errMsg = e.getMessage();
                 Log.d("DEVICE", "InvalidDescriptionException = " + errMsg);
             }
-            return null;
+            return showersState;
         }
 
     //       public AsyncResponse delegate = null;
@@ -134,7 +131,8 @@ public class ShowerActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-
+            Log.d("DEVICE", "onpostexecute: "+result);
+            showShowerInfo(result);
         }
     }
 
@@ -144,19 +142,19 @@ public class ShowerActivity extends AppCompatActivity {
         cyberlinkDevice.stop();
     }
 
-    public static void showShowerInfo(String totalAmount) {
-        int showersTotalAmount = Integer.parseInt(totalAmount);
-        int showersTotalAvailable = 2;//Integer.parseInt(totalAvailable);
-        int showersWidth = Math.round((screenWidth - 24)/showersTotalAmount);
+    public static void showShowerInfo(String showersState) {
+        String[] showers = showersState.split("/");
+        int showersTotalAmount = Integer.parseInt(showers[1]);
+        int showersTotalAvailable = Integer.parseInt(showers[0]);
+        int showersWidth = Math.round((screenWidth - 100)/showersTotalAmount);
         int showersHeight = Math.round(showersWidth * 13/6.5f);
-        showerTV.setText(String.valueOf(showersTotalAmount));
-
+        showerTV.setText(showersState);
 
         for (int i = 0; i < showersTotalAvailable; i++) {
             douches.get(i).setImageBitmap(convertToBitmap(freeDrawable, showersWidth, showersHeight));
         }
 
-        for (int i = showersTotalAvailable; i < showersTotalAmount - showersTotalAvailable; i++ ) {
+        for (int i = showersTotalAvailable; i < showersTotalAmount - showersTotalAvailable +1; i++ ) {
             douches.get(i).setImageBitmap(convertToBitmap(takenDrawable, showersWidth, showersHeight));
         }
 

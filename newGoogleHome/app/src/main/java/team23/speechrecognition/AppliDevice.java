@@ -72,7 +72,7 @@ public class AppliDevice extends Device implements ActionListener, QueryListener
         askFlag = false;
         stateVar = getStateVariable("AskingState");
         stateVar.setValue("Stop");
-        System.out.println("Demande arrêtée!");
+        Log.d("DEVICE","Demande arrêtée!");
     }
 
     public String getAskingState() {
