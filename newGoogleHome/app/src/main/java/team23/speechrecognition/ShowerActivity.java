@@ -1,5 +1,6 @@
 package team23.speechrecognition;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -11,6 +12,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -34,12 +37,14 @@ public class ShowerActivity extends AppCompatActivity {
     protected int showerImageHeight;
     protected String nbTotalShowers = "";
     protected String nbAvailableShowers = "";
-    protected static Drawable freeDrawable;
-    protected static Drawable takenDrawable;
-    protected static ImageView douche1;
-    protected static ImageView douche2;
-    protected static ImageView douche3;
-    protected static ArrayList<ImageView> douches;
+    protected  Drawable freeDrawable;
+    protected  Drawable takenDrawable;
+    protected  ImageView douche1;
+    protected  ImageView douche2;
+    protected  ImageView douche3;
+    protected TextView consumptionTV;
+    protected Button refreshBtn;
+    protected  ArrayList<ImageView> douches;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +53,8 @@ public class ShowerActivity extends AppCompatActivity {
         infoTV = findViewById(R.id.info_textView);
         stateLayout = findViewById(R.id.show_showers_state_layout);
         showerTV = findViewById(R.id.available_shower);
-
+        consumptionTV = findViewById(R.id.consumption_text_view);
+        refreshBtn = findViewById(R.id.resfresh_button);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         screenWidth = displayMetrics.widthPixels;
@@ -76,6 +82,8 @@ public class ShowerActivity extends AppCompatActivity {
         UPnP.setEnable(UPnP.USE_ONLY_IPV4_ADDR);
         Log.d("DEVICE","should start device");
         new StartDeviceTask().execute();
+
+        refreshBtn.setOnClickListener(handleClickRefresh);
 
         try {
             wait(10000);
@@ -116,7 +124,9 @@ public class ShowerActivity extends AppCompatActivity {
                 cyberlinkDevice.startAsking();
                 while (showersState.equals("/")) {
                     showersState = cyberlinkDevice.getNbAvailableShowers()+
-                            "/"+cyberlinkDevice.getNbTotalShowers();
+                            "/"+cyberlinkDevice.getNbTotalShowers()+
+                            "/"+cyberlinkDevice.getFloorConsumption();
+                    Log.d("DEVICE", "floor consumption:"+cyberlinkDevice.getFloorConsumption());
                 }
                 Log.d("DEVICE", "STARTED DEVICE...........");
             } catch (InvalidDescriptionException e) {
@@ -142,13 +152,15 @@ public class ShowerActivity extends AppCompatActivity {
         cyberlinkDevice.stop();
     }
 
-    public static void showShowerInfo(String showersState) {
-        String[] showers = showersState.split("/");
-        int showersTotalAmount = Integer.parseInt(showers[1]);
-        int showersTotalAvailable = Integer.parseInt(showers[0]);
+    @SuppressLint("SetTextI18n")
+    public void showShowerInfo(String showersState) {
+        String[] showersInformation = showersState.split("/");
+        int showersTotalAmount = Integer.parseInt(showersInformation[1]);
+        int showersTotalAvailable = Integer.parseInt(showersInformation[0]);
         int showersWidth = Math.round((screenWidth - 100)/showersTotalAmount);
         int showersHeight = Math.round(showersWidth * 13/6.5f);
         showerTV.setText(showersState);
+        consumptionTV.setText("Consommation des 3 dernières semaines de l'étage en eau: "+showersInformation[2]+"L");
 
         for (int i = 0; i < showersTotalAvailable; i++) {
             douches.get(i).setImageBitmap(convertToBitmap(freeDrawable, showersWidth, showersHeight));
@@ -163,7 +175,22 @@ public class ShowerActivity extends AppCompatActivity {
         }
     }
 
-    public static Bitmap convertToBitmap(Drawable drawable, int widthPixels, int heightPixels) {
+    private View.OnClickListener handleClickRefresh = new View.OnClickListener(){
+        @Override
+        public void onClick(View v) {
+            if (cyberlinkDevice != null) {
+                try {
+                    cyberlinkDevice.startAsking();
+                } catch (Exception e) {
+                }
+            } else {
+                new StartDeviceTask().execute();
+            }
+        }
+    };
+
+
+    public Bitmap convertToBitmap(Drawable drawable, int widthPixels, int heightPixels) {
         Bitmap mutableBitmap = Bitmap.createBitmap(widthPixels, heightPixels, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(mutableBitmap);
         drawable.setBounds(0, 0, widthPixels, heightPixels);

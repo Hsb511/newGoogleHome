@@ -18,10 +18,12 @@ public class AppliDevice extends Device implements ActionListener, QueryListener
     private StateVariable stateVar;
     private StateVariable nbAvailableShowerState;
     private StateVariable nbTotalShowersState;
+    private StateVariable floorConsumptionState;
     private String nbAvailableShowers = "";
     private String nbTotalShowers = "";
     private String nameBuilding = "";
     private String nameFloor = "";
+    private String floorConsumption = "";
 
 
     public AppliDevice(InputStream inputStream) throws InvalidDescriptionException {
@@ -32,8 +34,8 @@ public class AppliDevice extends Device implements ActionListener, QueryListener
         Action getStateAction = getAction("GetAskingState");
         getStateAction.setActionListener(this);
 
-        Action setAvailableShowersAction = getAction("SetAvailableShowers");
-        setAvailableShowersAction.setActionListener(this);
+        Action setShowersInformation = getAction("SetShowersInformation");
+        setShowersInformation.setActionListener(this);
 
         Action getBuildingFloorAction = getAction("GetBuildingFloor");
         getBuildingFloorAction.setActionListener(this);
@@ -65,7 +67,7 @@ public class AppliDevice extends Device implements ActionListener, QueryListener
         askFlag = true;
         stateVar = getStateVariable("AskingState");
         stateVar.setValue("Start");
-        System.out.println("Demande lancée!");
+        Log.d("DEVICE","Demande lancée!");
     }
 
     public void stopAsking() {
@@ -98,11 +100,13 @@ public class AppliDevice extends Device implements ActionListener, QueryListener
             ret = true;
         }
 
-        if (actionName.equals("SetAvailableShowers")) {
+        if (actionName.equals("SetShowersInformation")) {
             Argument nbOfShower = action.getArgument("NbAvailableShowers");
             nbAvailableShowers = nbOfShower.getValue();
             Argument nbTotalShowersArg = action.getArgument("NbTotalShowers");
             nbTotalShowers = nbTotalShowersArg.getValue();
+            Argument floorConsumptionArg = action.getArgument("FloorConsumption");
+            floorConsumption = floorConsumptionArg.getValue();
             stopAsking();
             //ShowerActivity.showShowerInfo(nbAvailableShowers, nbTotalShowers);
             System.out.println("Nombre de douches : " + nbAvailableShowers);
@@ -145,5 +149,7 @@ public class AppliDevice extends Device implements ActionListener, QueryListener
     public String getNbTotalShowers(){
         return nbTotalShowers;
     }
+
+    public String getFloorConsumption() { return floorConsumption; };
 }
 

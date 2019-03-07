@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:text="Rentre tes infos"
+        android:text="@string/enter_your_information"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:visibility="visible" />
@@ -62,7 +62,7 @@
         android:id="@+id/confirm_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Confirmer" />
+        android:text="@string/confirm" />
 
 
 </LinearLayout>

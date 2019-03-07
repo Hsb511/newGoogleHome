@@ -6,5 +6,9 @@
     <string name="building">Building</string>
     <string name="floor">Floor</string>
     <string name="available_showers">Amount of available showers : </string>
+    <string name="enter_your_information">Enter your information</string>
+    <string name="confirm">Confirm</string>
+    <string name="refresh">Refresh</string>
+    <string name="loading">Loading...</string>
 
 </resources>
