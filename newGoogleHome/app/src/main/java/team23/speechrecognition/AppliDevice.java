@@ -104,7 +104,7 @@ public class AppliDevice extends Device implements ActionListener, QueryListener
             Argument nbTotalShowersArg = action.getArgument("NbTotalShowers");
             nbTotalShowers = nbTotalShowersArg.getValue();
             stopAsking();
-            ShowerActivity.showShowerInfo(nbAvailableShowers);
+            //ShowerActivity.showShowerInfo(nbAvailableShowers, nbTotalShowers);
             System.out.println("Nombre de douches : " + nbAvailableShowers);
             Log.d("DEVICE", "Nombre de douches : " + nbAvailableShowers);
             ret = true;
@@ -136,6 +136,14 @@ public class AppliDevice extends Device implements ActionListener, QueryListener
     ////////////////////////////////////////////////
 
     public void update() {
+    }
+
+    public String getNbAvailableShowers() {
+        return nbAvailableShowers;
+    }
+
+    public String getNbTotalShowers(){
+        return nbTotalShowers;
     }
 }
 

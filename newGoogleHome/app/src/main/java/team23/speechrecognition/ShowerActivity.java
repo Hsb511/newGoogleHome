@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
+
 import android.os.AsyncTask;
 import android.os.Process;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +26,7 @@ import org.cybergarage.upnp.device.InvalidDescriptionException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 public class ShowerActivity extends AppCompatActivity {
     protected static TextView infoTV;
@@ -37,10 +39,12 @@ public class ShowerActivity extends AppCompatActivity {
     protected int showerImageHeight;
     protected String nbTotalShowers = "";
     protected String nbAvailableShowers = "";
-    protected static Drawable drawable;
+    protected static Drawable freeDrawable;
+    protected static Drawable takenDrawable;
     protected static ImageView douche1;
     protected static ImageView douche2;
     protected static ImageView douche3;
+    protected static ArrayList<ImageView> douches;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,22 +67,34 @@ public class ShowerActivity extends AppCompatActivity {
                 + myFloor;
         infoTV.setText(displayInfo);
 
-        drawable = getResources().getDrawable(R.drawable.free_shower);
+        freeDrawable = getResources().getDrawable(R.drawable.free_shower);
+        takenDrawable = getResources().getDrawable(R.drawable.using_shower);
 
         douche1 = new ImageView(getApplicationContext());
         douche2 = new ImageView(getApplicationContext());
         douche3 = new ImageView(getApplicationContext());
+        douches = new ArrayList<>();
+        douches.add(douche1);
+        douches.add(douche2);
+        douches.add(douche3);
 
         UPnP.setEnable(UPnP.USE_ONLY_IPV4_ADDR);
         Log.d("DEVICE","should start device");
         new StartDeviceTask().execute();
+
+        try {
+            wait(10000);
+
+        } catch (Exception e) {
+
+        }
     }
 
-    private class StartDeviceTask extends AsyncTask {
+    private class StartDeviceTask extends AsyncTask<Void, Void, String> {
         public static final String TAG = "StartControlPointTask";
 
         @Override
-        protected Object doInBackground(Object... params) {
+        protected Void doInBackground(Void... params) {
             Process.setThreadPriority(Process.THREAD_PRIORITY_FOREGROUND);
             try {
                 InputStream inputStream = getResources().openRawResource(R.raw.description_device);
@@ -112,6 +128,14 @@ public class ShowerActivity extends AppCompatActivity {
             }
             return null;
         }
+
+    //       public AsyncResponse delegate = null;
+
+
+        @Override
+        protected void onPostExecute(String result) {
+
+        }
     }
 
     @Override
@@ -120,20 +144,24 @@ public class ShowerActivity extends AppCompatActivity {
         cyberlinkDevice.stop();
     }
 
-    public static void showShowerInfo(String amount) {
-        int showersAmount = Integer.parseInt(amount);
+    public static void showShowerInfo(String totalAmount) {
+        int showersTotalAmount = Integer.parseInt(totalAmount);
+        int showersTotalAvailable = 2;//Integer.parseInt(totalAvailable);
+        int showersWidth = Math.round((screenWidth - 24)/showersTotalAmount);
+        int showersHeight = Math.round(showersWidth * 13/6.5f);
+        showerTV.setText(String.valueOf(showersTotalAmount));
 
-        int showers = showersAmount;
-        showerTV.setText(String.valueOf(showers));
 
-        for (int i = 0; i < showers; i++) {
-            //TODO RECUPERE NON DYNAMIQUEMENT LES DOUCHE1, 2 ET 3
-            int showerWidth = Math.round((screenWidth - 32)/showers);
-            int showerHeight = Math.round(showerWidth * 13 / 6);
+        for (int i = 0; i < showersTotalAvailable; i++) {
+            douches.get(i).setImageBitmap(convertToBitmap(freeDrawable, showersWidth, showersHeight));
+        }
 
-            iv.setImageBitmap(convertToBitmap(drawable, showerWidth, showerHeight));
-            stateLayout.addView(iv);
-            Log.i("DEVICE", "showers ImageView : " + stateLayout.getChildCount());
+        for (int i = showersTotalAvailable; i < showersTotalAmount - showersTotalAvailable; i++ ) {
+            douches.get(i).setImageBitmap(convertToBitmap(takenDrawable, showersWidth, showersHeight));
+        }
+
+        for (int i = 0; i < showersTotalAmount; i++) {
+            stateLayout.addView(douches.get(i));
         }
     }
 
