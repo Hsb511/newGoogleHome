@@ -34,6 +34,11 @@
                     <direction>in</direction>
                 </argument>
                 <argument>
+                    <name>EcoTip</name>
+                    <relatedStateVariable>ecoTip</relatedStateVariable>
+                    <direction>in</direction>
+                </argument>
+                <argument>
                     <name>Result</name>
                     <relatedStateVariable>Result</relatedStateVariable>
                     <direction>out</direction>
@@ -67,6 +72,10 @@
         </stateVariable>
         <stateVariable sendEvents="no">
             <name>floorConsumption</name>
+            <dataType>string</dataType>
+        </stateVariable>
+        <stateVariable sendEvents="no">
+            <name>ecoTip</name>
             <dataType>string</dataType>
         </stateVariable>
         <stateVariable sendEvents="no">

@@ -24,6 +24,7 @@ public class AppliDevice extends Device implements ActionListener, QueryListener
     private String nameBuilding = "";
     private String nameFloor = "";
     private String floorConsumption = "";
+    private String ecoTip = "";
 
 
     public AppliDevice(InputStream inputStream) throws InvalidDescriptionException {
@@ -107,9 +108,9 @@ public class AppliDevice extends Device implements ActionListener, QueryListener
             nbTotalShowers = nbTotalShowersArg.getValue();
             Argument floorConsumptionArg = action.getArgument("FloorConsumption");
             floorConsumption = floorConsumptionArg.getValue();
+            Argument ecoTipArg = action.getArgument("EcoTip");
+            ecoTip = ecoTipArg.getValue();
             stopAsking();
-            //ShowerActivity.showShowerInfo(nbAvailableShowers, nbTotalShowers);
-            System.out.println("Nombre de douches : " + nbAvailableShowers);
             Log.d("DEVICE", "Nombre de douches : " + nbAvailableShowers);
             ret = true;
         }
@@ -151,5 +152,7 @@ public class AppliDevice extends Device implements ActionListener, QueryListener
     }
 
     public String getFloorConsumption() { return floorConsumption; };
+
+    public String getEcoTip() { return  ecoTip;}
 }
 

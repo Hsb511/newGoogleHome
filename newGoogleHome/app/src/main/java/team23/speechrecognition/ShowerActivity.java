@@ -35,6 +35,7 @@ public class ShowerActivity extends AppCompatActivity {
     protected  ImageView douche2;
     protected  ImageView douche3;
     protected TextView consumptionTV;
+    protected TextView ecoTipTV;
     protected Button refreshBtn;
     protected  ArrayList<ImageView> douches;
 
@@ -55,6 +56,7 @@ public class ShowerActivity extends AppCompatActivity {
         showerTV = findViewById(R.id.available_shower);
         consumptionTV = findViewById(R.id.consumption_text_view);
         refreshBtn = findViewById(R.id.resfresh_button);
+        ecoTipTV = findViewById(R.id.eco_tip_text_view);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         screenWidth = displayMetrics.widthPixels;
@@ -109,6 +111,7 @@ public class ShowerActivity extends AppCompatActivity {
         String consumption =
                 "Consommation des 3 dernières semaines de l'étage en eau: "+showersInformation[2]+"L";
         consumptionTV.setText(consumption);
+        ecoTipTV.setText("Eco tip: " + showersInformation[3]);
 
         for (int i = 0; i < showersTotalAvailable; i++) {
             douches.get(i).setImageBitmap(convertToBitmap(freeDrawable, showersWidth, showersHeight));
@@ -144,7 +147,7 @@ public class ShowerActivity extends AppCompatActivity {
     }
 
     private class StartDeviceTask extends AsyncTask<Void, Void, String> {
-        private String showersState = "//";
+        private String showersState = "///";
         @Override
         protected String doInBackground(Void... params) {
             Process.setThreadPriority(Process.THREAD_PRIORITY_FOREGROUND);
@@ -172,11 +175,12 @@ public class ShowerActivity extends AppCompatActivity {
                 Log.d("DEVICE", "CREATED DEVICE...........");
                 cyberlinkDevice.startDevice();
                 cyberlinkDevice.startAsking();
-                while (showersState.equals("/")) {
+                while (showersState.equals("///")) {
                     showersState = cyberlinkDevice.getNbAvailableShowers()+
                             "/"+cyberlinkDevice.getNbTotalShowers()+
-                            "/"+cyberlinkDevice.getFloorConsumption();
-                    Log.d("DEVICE", "floor consumption:"+cyberlinkDevice.getFloorConsumption());
+                            "/"+cyberlinkDevice.getFloorConsumption()+
+                            "/"+cyberlinkDevice.getEcoTip();
+                    Log.d("DEVICE", "info gotten by activity: "+showersState);
                 }
                 Log.d("DEVICE", "STARTED DEVICE...........");
             } catch (InvalidDescriptionException e) {
@@ -194,16 +198,17 @@ public class ShowerActivity extends AppCompatActivity {
     }
 
     private class StartAskingTask extends AsyncTask<Void, Void, String> {
-        private String showersState = "/";
+        private String showersState = "///";
         @Override
         protected String doInBackground(Void... params) {
             Process.setThreadPriority(Process.THREAD_PRIORITY_FOREGROUND);
             cyberlinkDevice.startAsking();
-            while (showersState.equals("//")) {
+            while (showersState.equals("///")) {
                 showersState = cyberlinkDevice.getNbAvailableShowers()+
                         "/"+cyberlinkDevice.getNbTotalShowers()+
-                        "/"+cyberlinkDevice.getFloorConsumption();
-                Log.d("DEVICE", "floor consumption:"+cyberlinkDevice.getFloorConsumption());
+                        "/"+cyberlinkDevice.getFloorConsumption()+
+                        "/"+cyberlinkDevice.getEcoTip();
+                Log.d("DEVICE", "Info gotten by activity: "+showersState);
             }
             return showersState;
         }
