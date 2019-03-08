@@ -180,9 +180,9 @@ public class ShowerActivity extends AppCompatActivity {
                             "/"+cyberlinkDevice.getNbTotalShowers()+
                             "/"+cyberlinkDevice.getFloorConsumption()+
                             "/"+cyberlinkDevice.getEcoTip();
-                    Log.d("DEVICE", "info gotten by activity: "+showersState);
                 }
                 Log.d("DEVICE", "STARTED DEVICE...........");
+                Log.d("DEVICE", "info gotten by activity: "+showersState);
             } catch (InvalidDescriptionException e) {
                 String errMsg = e.getMessage();
                 Log.d("DEVICE", "InvalidDescriptionException = " + errMsg);
@@ -208,8 +208,8 @@ public class ShowerActivity extends AppCompatActivity {
                         "/"+cyberlinkDevice.getNbTotalShowers()+
                         "/"+cyberlinkDevice.getFloorConsumption()+
                         "/"+cyberlinkDevice.getEcoTip();
-                Log.d("DEVICE", "Info gotten by activity: "+showersState);
             }
+            Log.d("DEVICE", "Info gotten by activity: "+showersState);
             return showersState;
         }
 
