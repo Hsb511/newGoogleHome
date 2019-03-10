@@ -84,43 +84,43 @@ public class ShowerActivity extends AppCompatActivity {
         douches.add(douche3);
 
         UPnP.setEnable(UPnP.USE_ONLY_IPV4_ADDR);
-        Log.d("DEVICE","should start device");
         new StartDeviceTask().execute();
 
         refreshBtn.setOnClickListener(handleClickRefresh);
 
-        try {
-            wait(10000);
-        } catch (Exception e) {}
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        cyberlinkDevice.stop();
+        //cyberlinkDevice.stop();
     }
 
     @SuppressLint("SetTextI18n")
     public void showShowerInfo(String showersState) {
         String[] showersInformation = showersState.split("/");
-        int showersTotalAmount = Integer.parseInt(showersInformation[1]);
-        int showersTotalAvailable = Integer.parseInt(showersInformation[0]);
-        int showersWidth = Math.round((screenWidth - 100)/showersTotalAmount);
-        int showersHeight = Math.round(showersWidth * 13/6.5f);
-        showerTV.setText(showersState);
-        String consumption =
-                "Consommation des 3 dernières semaines de l'étage en eau: "+showersInformation[2]+"L";
-        consumptionTV.setText(consumption);
-        ecoTipTV.setText("Eco tip: " + showersInformation[3]);
+        if (showersInformation.length < 4) {
+            Log.d("DEVICE", "error nb arguments");
+        } else {
+            int showersTotalAmount = Integer.parseInt(showersInformation[1]);
+            int showersTotalAvailable = Integer.parseInt(showersInformation[0]);
+            int showersWidth = Math.round((screenWidth - 100)/showersTotalAmount);
+            int showersHeight = Math.round(showersWidth * 13/6.5f);
+            showerTV.setText(showersInformation[0]+"/"+showersInformation[1]);
+            String consumption =
+                    "Consommation des 3 dernières semaines de l'étage en eau: "+showersInformation[2]+"L";
+            consumptionTV.setText(consumption);
+            ecoTipTV.setText("Eco tip: " + showersInformation[3]);
 
-        for (int i = 0; i < showersTotalAvailable; i++) {
-            douches.get(i).setImageBitmap(convertToBitmap(freeDrawable, showersWidth, showersHeight));
-        }
-        for (int i = showersTotalAvailable; i < showersTotalAmount - showersTotalAvailable +1; i++ ) {
-            douches.get(i).setImageBitmap(convertToBitmap(takenDrawable, showersWidth, showersHeight));
-        }
-        for (int i = 0; i < showersTotalAmount; i++) {
-            stateLayout.addView(douches.get(i));
+            for (int i = 0; i < showersTotalAvailable; i++) {
+                douches.get(i).setImageBitmap(convertToBitmap(freeDrawable, showersWidth, showersHeight));
+            }
+            for (int i = showersTotalAvailable; i < showersTotalAmount - showersTotalAvailable +1; i++ ) {
+                douches.get(i).setImageBitmap(convertToBitmap(takenDrawable, showersWidth, showersHeight));
+            }
+            for (int i = 0; i < showersTotalAmount; i++) {
+                stateLayout.addView(douches.get(i));
+            }
         }
     }
 
@@ -129,9 +129,10 @@ public class ShowerActivity extends AppCompatActivity {
         public void onClick(View v) {
         if (cyberlinkDevice != null) {
             new StartAskingTask().execute();
+            Log.d("DEVICE", "Asking again");
         } else {
             Log.d("DEVICE","Trying to ask when device not initialised");
-            new StartDeviceTask().execute();
+            //new StartDeviceTask().execute();
         }
         }
     };
@@ -157,7 +158,7 @@ public class ShowerActivity extends AppCompatActivity {
                 SharedPreferences preferences =
                         getSharedPreferences(InformationActivity.MY_PREFERENCES, MODE_PRIVATE);
                 myBuilding = preferences.getString(InformationActivity.MY_BUILDING, "i1");
-                myFloor = preferences.getString(InformationActivity.MY_FLOOR, "1");
+                myFloor = preferences.getString(InformationActivity.MY_FLOOR, "0");
                 cyberlinkDevice.setNameBuilding(myBuilding);
                 cyberlinkDevice.setNameFloor(myFloor);
                 Service upnpService = cyberlinkDevice.getService("urn:schemas-upnp-org:serviceId:state:1");
@@ -172,16 +173,20 @@ public class ShowerActivity extends AppCompatActivity {
                     // Error handling
                 }
                 boolean scpdSuccess = upnpService.loadSCPD(xmlServices);
-                Log.d("DEVICE", "CREATED DEVICE...........");
+                Log.d("DEVICE", "CREATED DEVICE");
                 cyberlinkDevice.startDevice();
+                Log.d("DEVICE", "STARTED DEVICE");
                 cyberlinkDevice.startAsking();
-                while (showersState.equals("///")) {
-                    showersState = cyberlinkDevice.getNbAvailableShowers()+
-                            "/"+cyberlinkDevice.getNbTotalShowers()+
-                            "/"+cyberlinkDevice.getFloorConsumption()+
-                            "/"+cyberlinkDevice.getEcoTip();
+                while (cyberlinkDevice.getFloorConsumption().equals("")
+                        && cyberlinkDevice.getEcoTip().equals("")
+                        &&  cyberlinkDevice.getNbAvailableShowers().equals("")
+                        && cyberlinkDevice.getNbTotalShowers().equals("")  ) {
+                    continue;
                 }
-                Log.d("DEVICE", "STARTED DEVICE...........");
+                showersState = cyberlinkDevice.getNbAvailableShowers()+
+                        "/"+cyberlinkDevice.getNbTotalShowers()+
+                        "/"+cyberlinkDevice.getFloorConsumption()+
+                        "/"+cyberlinkDevice.getEcoTip();
                 Log.d("DEVICE", "info gotten by activity: "+showersState);
             } catch (InvalidDescriptionException e) {
                 String errMsg = e.getMessage();
@@ -203,19 +208,23 @@ public class ShowerActivity extends AppCompatActivity {
         protected String doInBackground(Void... params) {
             Process.setThreadPriority(Process.THREAD_PRIORITY_FOREGROUND);
             cyberlinkDevice.startAsking();
-            while (showersState.equals("///")) {
-                showersState = cyberlinkDevice.getNbAvailableShowers()+
-                        "/"+cyberlinkDevice.getNbTotalShowers()+
-                        "/"+cyberlinkDevice.getFloorConsumption()+
-                        "/"+cyberlinkDevice.getEcoTip();
+            while (cyberlinkDevice.getFloorConsumption().equals("")
+                    && cyberlinkDevice.getEcoTip().equals("")
+                    &&  cyberlinkDevice.getNbAvailableShowers().equals("")
+                    && cyberlinkDevice.getNbTotalShowers().equals("")  ) {
+                continue;
             }
+            showersState = cyberlinkDevice.getNbAvailableShowers()+
+                    "/"+cyberlinkDevice.getNbTotalShowers()+
+                    "/"+cyberlinkDevice.getFloorConsumption()+
+                    "/"+cyberlinkDevice.getEcoTip();
             Log.d("DEVICE", "Info gotten by activity: "+showersState);
             return showersState;
         }
 
         @Override
         protected void onPostExecute(String result) {
-            Log.d("DEVICE", "on Post execute STRAT ASKING : "+result);
+            Log.d("DEVICE", "on Post execute START ASKING : "+result);
             showShowerInfo(result);
         }
     }

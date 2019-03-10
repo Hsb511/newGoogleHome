@@ -111,7 +111,11 @@ public class AppliDevice extends Device implements ActionListener, QueryListener
             Argument ecoTipArg = action.getArgument("EcoTip");
             ecoTip = ecoTipArg.getValue();
             stopAsking();
-            Log.d("DEVICE", "Nombre de douches : " + nbAvailableShowers);
+            Log.d("DEVICE", "Received shoers information");
+            Log.d("DEVICE", "Nombre de douches dispo: " + nbAvailableShowers);
+            Log.d("DEVICE", "Nombre de douches total: " + nbTotalShowers);
+            Log.d("DEVICE", "Consommation: " + floorConsumption);
+            Log.d("DEVICE", "Eco tip: " + ecoTip);
             ret = true;
         }
 
